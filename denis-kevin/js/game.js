@@ -7,6 +7,17 @@ var states = {
     game: "game",
 };
 
+// These states are represented by their index in the tank state array.
+var tankStates = {
+    moving: 0,
+    turretRotating: 1,
+    firing: 2,
+    reloading: 3,
+};
+// Assume that tank only has one state.
+var currentTankState = tankStates.moving;
+var timeUntilSwitchAllowed = 0;
+var switchDelay = 500;
 
 var tank, turret, bullets;
 var nextFire = 0, currentSpeed = 0;
@@ -35,6 +46,8 @@ gameState.prototype = {
         // Add tank
         tank = game.add.sprite(0, 0, 'tank');
         tank.anchor.setTo(0.5, 0.5);
+        // moving, turretRotating, firing, reloading (initially can move only)
+        tank.state = [true, false, false, false];
 
         game.physics.enable(tank, Phaser.Physics.ARCADE);
         tank.body.drag.set(0.2);
@@ -61,23 +74,53 @@ gameState.prototype = {
         cursors = game.input.keyboard.createCursorKeys();
         fireKey = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
         turretRotationKeys = game.input.keyboard.addKeys({"rotateLeft": Phaser.KeyCode.Q, "rotateRight": Phaser.KeyCode.E});
+        stateSwitchingKeys = game.input.keyboard.addKeys({"moving": Phaser.KeyCode.ONE, "turretRotating": Phaser.KeyCode.TWO,
+                                                            "firing": Phaser.KeyCode.THREE, "reloading": Phaser.KeyCode.FOUR});
     },
 
     update: function() {
-
-        // tank movement
-        if (cursors.left.isDown) {
-            tank.angle -= 4;
-        }
-        else if (cursors.right.isDown) {
-            tank.angle += 4;
-        } else if (cursors.up.isDown) {
-            currentSpeed = 300;
-        } else {
-            if (currentSpeed > 0) {
-                currentSpeed -= 4;
+        // Switching tank states
+        timeUntilSwitchAllowed = Math.max(0, timeUntilSwitchAllowed - game.time.elapsed);
+        if (timeUntilSwitchAllowed == 0) {
+            if (stateSwitchingKeys.moving.isDown && !tank.state[tankStates.moving]) {
+                tank.state[currentTankState] = false;
+                tank.state[tankStates.moving] = true;
+                currentTankState = tankStates.moving;
+                timeUntilSwitchAllowed = switchDelay;
+            } else if (stateSwitchingKeys.turretRotating.isDown && !tank.state[tankStates.turretRotating]) {
+                tank.state[currentTankState] = false;
+                tank.state[tankStates.turretRotating] = true;
+                currentTankState = tankStates.turretRotating;
+                timeUntilSwitchAllowed = switchDelay;
+            } else if (stateSwitchingKeys.firing.isDown && !tank.state[tankStates.firing]) {
+                tank.state[currentTankState] = false;
+                tank.state[tankStates.firing] = true;
+                currentTankState = tankStates.firing;
+                timeUntilSwitchAllowed = switchDelay;
+            } else if (stateSwitchingKeys.reloading.isDown && !tank.state[tankStates.reloading]) {
+                tank.state[currentTankState] = false;
+                tank.state[tankStates.reloading] = true;
+                currentTankState = tankStates.reloading;
+                timeUntilSwitchAllowed = switchDelay;
             }
         }
+
+        // Tank movement
+        if (tank.state[tankStates.moving]) {
+            if (cursors.left.isDown) {
+                tank.angle -= 4;
+            }
+            else if (cursors.right.isDown) {
+                tank.angle += 4;
+            } else if (cursors.up.isDown) {
+                currentSpeed = 300;
+            } else {
+                if (currentSpeed > 0) {
+                    currentSpeed -= 4;
+                }
+            }
+        }
+
         if (currentSpeed > 0) {
             game.physics.arcade.velocityFromRotation(tank.rotation - Math.PI / 2, currentSpeed, tank.body.velocity);
         }
@@ -86,17 +129,21 @@ gameState.prototype = {
         turret.x = tank.x;
         turret.y = tank.y;
 
-        //
-        if (turretRotationKeys.rotateLeft.isDown) {
-            turret.angle -= 4;
-        } else if (turretRotationKeys.rotateRight.isDown) {
-            turret.angle += 4;
+        // Turning the turret
+        if (tank.state[tankStates.turretRotating]) {
+            if (turretRotationKeys.rotateLeft.isDown) {
+                turret.angle -= 4;
+            } else if (turretRotationKeys.rotateRight.isDown) {
+                turret.angle += 4;
+            }
         }
 
         // Fire bullets
-        if (fireKey.isDown)
-        {
-            fire();
+        if (tank.state[tankStates.firing]) {
+            if (fireKey.isDown)
+            {
+                fire();
+            }
         }
 
     }
