@@ -4,10 +4,29 @@
         <title></title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="js/phaser.min.js"></script>
-        <script src="js/game.js"></script>        
     </head>
     <body>
         <div id="gameDiv"> </div>
+        <div id="text">
+            Current state: <span id="currentState"></span><br><br>
+            Bullet count: <span id="bulletCount"></span><br>
+            <br><br><br>
+        </div>
+        <div>
+            Blue bar is the state switch timer.<br>
+            Green bar is the time between bullets / reload time.<br>
+            Keys: <br>
+            1,2,3,4 for swapping states<br>
+            1: TANK MOVEMENT, 2: TURRET ROTATION, 3: FIRE BULLETS, 4: RELOAD<br><br>
+
+            Up/Left/Right: Turret movement (Rotate and forward movement only)<br>
+            Q: Rotate turret counterclockwise, E: Rotate Turret Clockwise<br>
+            SPACEBAR: Fire bullet<br>
+            R: Reload (+20 bullets)<br>
+
+        </div>
+        <!-- Load after since game.js requires some information about div elements in HTML -->
+        <script src="js/phaser.min.js"></script>
+        <script src="js/game.js"></script>
     </body>
 </html>

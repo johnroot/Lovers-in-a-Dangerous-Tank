@@ -14,6 +14,9 @@ var tankStates = {
     firing: 2,
     reloading: 3,
 };
+
+var tankStateStrings = ["TANK MOVEMENT", "TURRET ROTATION", "FIRE BULLETS", "RELOAD"];
+
 // Assume that tank only has one state.
 var currentTankState = tankStates.moving;
 var timeUntilSwitchAllowed = 0;
@@ -21,17 +24,30 @@ var switchDelay = 500;
 
 var tank, turret, bullets;
 var timeUntilNextFire = 0, currentSpeed = 0;
-var cursors, fireKey;
-var fireRate = 100;
-var bulletScale = 0.25;
+var cursors, fireKey, reloadKey;
+var fireRate = 500;
+var bulletScale = 0.125;
+var turretScale = 0.75;
+
+var debug = false;
+var bulletsLeft = 100;
+var maxBullets = 100, minBullets = 0;
+var currentStateDiv;
+var bulletCountDiv;
 
 var gameState = function(game) {
 };
 
 gameState.prototype = {
     preload: function() {
+        currentStateDiv = document.getElementById("currentState");
+        bulletCountDiv = document.getElementById("bulletCount");
+
+        // bullet is 32 x 32
         game.load.image('bullet', 'assets/bullet.png');
+        // turret is 16 x 64
         game.load.image('turret', 'assets/turret.png');
+        // tank is 32 x 32
         game.load.image('tank','assets/tank.png');
     },
 
@@ -55,9 +71,11 @@ gameState.prototype = {
         tank.body.collideWorldBounds = true;
 
         turret = game.add.sprite(0, 0, 'turret');
-        turret.scale.setTo(0.75, 0.75);
-        turret.anchor.setTo(0.3, 0.8);
-        // game.physics.enable(turret, Phaser.Physics.ARCADE);
+        turret.scale.setTo(turretScale);
+        // Scaled down to 8 x 32 - Want to shift it so that it's symmetrical
+        // Hardcoded since I don't know how to do math.
+        turret.anchor.setTo(0.5, .875);
+        game.physics.enable(turret, Phaser.Physics.ARCADE);
         // turret.body.
 
 
@@ -65,7 +83,7 @@ gameState.prototype = {
         bullets.enableBody = true;
         bullets.scale.setTo(bulletScale, bulletScale);
         bullets.physicsBodyType = Phaser.Physics.ARCADE;
-        bullets.createMultiple(100, 'bullet', 0, false);
+        bullets.createMultiple(bulletsLeft, 'bullet', 0, false);
         bullets.setAll('anchor.x', 0.5);
         bullets.setAll('anchor.y', 0.5);
         bullets.setAll('outOfBoundsKill', true);
@@ -73,9 +91,11 @@ gameState.prototype = {
 
         cursors = game.input.keyboard.createCursorKeys();
         fireKey = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+        reloadKey = game.input.keyboard.addKey(Phaser.KeyCode.R);
         turretRotationKeys = game.input.keyboard.addKeys({"rotateLeft": Phaser.KeyCode.Q, "rotateRight": Phaser.KeyCode.E});
         stateSwitchingKeys = game.input.keyboard.addKeys({"moving": Phaser.KeyCode.ONE, "turretRotating": Phaser.KeyCode.TWO,
                                                             "firing": Phaser.KeyCode.THREE, "reloading": Phaser.KeyCode.FOUR});
+
         var graphics = game.add.graphics(0, 0);
         window.graphics = graphics;
     },
@@ -105,6 +125,7 @@ gameState.prototype = {
                 currentTankState = tankStates.reloading;
                 timeUntilSwitchAllowed = switchDelay;
             }
+            currentStateDiv.innerHTML = tankStateStrings[currentTankState];
         }
 
         // Tank movement
@@ -115,7 +136,7 @@ gameState.prototype = {
             else if (cursors.right.isDown) {
                 tank.angle += 4;
             } else if (cursors.up.isDown) {
-                currentSpeed = 300;
+                currentSpeed = 150;
             } else {
                 if (currentSpeed > 0) {
                     currentSpeed -= 4;
@@ -149,6 +170,14 @@ gameState.prototype = {
             }
         }
 
+        if (tank.state[tankStates.reloading]) {
+            if (reloadKey.isDown) {
+                reload();
+            }
+        }
+
+        bulletCountDiv.innerHTML = bulletsLeft;
+
         // Draw fire and switch reloading bars.
         var barWidth = 200, barHeight = 20;
         var startingX = gameProperties.screenWidth / 2 - barWidth / 2, startingY = 10;
@@ -157,34 +186,57 @@ gameState.prototype = {
         graphics.clear();
         graphics.lineStyle(0);
         graphics.beginFill(0x005FF0, 1);
-        graphics.drawRect(startingX, startingY, 
-            barWidth * (switchDelay - timeUntilSwitchAllowed) / switchDelay, 
+        graphics.drawRect(startingX, startingY,
+            barWidth * (switchDelay - timeUntilSwitchAllowed) / switchDelay,
             barHeight);
         graphics.endFill();
         graphics.beginFill(0x00F05F, 1);
-        graphics.drawRect(startingX, startingY + barHeight + barSeparation, 
+        graphics.drawRect(startingX, startingY + barHeight + barSeparation,
             barWidth * (fireRate - timeUntilNextFire) / fireRate,
             barHeight);
         graphics.endFill();
-    }
+    },
+
+    render: function() {
+        if (debug) {
+            // game.debug.body(tank);
+            game.debug.body(turret);
+            var graphics = game.add.graphics(0, 0);
+            graphics.lineStyle(0);
+            graphics.beginFill(0xFFFF0B, 0.5);
+            graphics.drawCircle(gameProperties.screenWidth / 2, gameProperties.screenHeight / 2, 2);
+            graphics.endFill();
+        }
+    },
 
 };
 
 var fire = function() {
+    if (timeUntilNextFire == 0 && bulletsLeft > minBullets) {
+        bulletsLeft--;
+        if (bulletsLeft < minBullets) {
+            bulletsLeft = minBullets;
+        }
 
-    if (timeUntilNextFire == 0 && bullets.countDead() > 0) {
         nextFire = game.time.now + fireRate;
 
         var bullet = bullets.getFirstExists(false);
-        var distanceOffset = 10;
-        var offsetX = Math.cos(turret.rotation - Math.PI / 2) * turret.height + distanceOffset;
-        var offsetY = Math.sin(turret.rotation - Math.PI / 2) * turret.height + distanceOffset;
-        bullet.reset(1 / bulletScale *(turret.x + offsetX), 1 / bulletScale * (turret.y + offsetY));
-        game.physics.arcade.velocityFromRotation(turret.rotation - Math.PI / 2, 200, bullet.body.velocity);
-        
+        var distanceOffset = 5;
+        var offsetX = Math.cos(turret.rotation - Math.PI / 2) * (turret.height + distanceOffset);
+        var offsetY = Math.sin(turret.rotation - Math.PI / 2) * (turret.height + distanceOffset);
+        bullet.reset(1 / bulletScale * (tank.x + offsetX), 1 / bulletScale * (tank.y + offsetY));
+        game.physics.arcade.velocityFromRotation(turret.rotation - Math.PI / 2, 400, bullet.body.velocity);
+
         timeUntilNextFire = fireRate;
     }
 }
+
+var reload = function() {
+    bulletsLeft += 20;
+    if (bulletsLeft > maxBullets) {
+        bulletsLeft = maxBullets;
+    }
+};
 
 var game = new Phaser.Game(gameProperties.screenWidth, gameProperties.screenHeight, Phaser.AUTO, 'gameDiv');
 game.state.add(states.game, gameState);
