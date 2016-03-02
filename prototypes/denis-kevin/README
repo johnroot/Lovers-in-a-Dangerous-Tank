@@ -1,0 +1,4 @@
+Phaser Digital Prototype
+`python -m SimpleHTTPServer <port>`
+to run on `localhost:<port>`
+
