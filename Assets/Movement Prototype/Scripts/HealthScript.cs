@@ -10,6 +10,10 @@ public class HealthScript : MonoBehaviour {
     public void DecreaseHealth(float damage)
     {
         health -= damage;
+        if (healthBar != null)
+        {
+            UpdateHealthBar();
+        }
         if (health <= 0)
         {
             Destroy(gameObject);

@@ -5,7 +5,6 @@ public class BulletScript : MonoBehaviour {
 
     public float speed;
     public float damage;
-    public GameObject owner;
 
 	// Use this for initialization
 	void Start () {
@@ -14,11 +13,9 @@ public class BulletScript : MonoBehaviour {
 	}
 
     void OnCollisionEnter2D(Collision2D coll) {
-        if (coll.gameObject != owner) {
-            HealthScript healthScript = coll.gameObject.GetComponent<HealthScript>();
-            if (healthScript != null) {
-                healthScript.DecreaseHealth(damage);
-            }
+        HealthScript healthScript = coll.gameObject.GetComponent<HealthScript>();
+        if (healthScript != null) {
+            healthScript.DecreaseHealth(damage);
         }
         Destroy(gameObject);
     }

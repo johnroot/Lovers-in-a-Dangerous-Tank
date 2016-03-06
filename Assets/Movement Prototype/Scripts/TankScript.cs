@@ -137,10 +137,10 @@ public class TankScript : MonoBehaviour {
             if (agent == State.Turret) {
                 Debug.Log("Agent detected");
                 GameObject bullet = turret.Fire();
-                setOwnerOfFiredBullet(bullet);
+                setLayerOfFiredBullet(bullet);
             } else if (agent == State.MachineGun) {
                 GameObject bullet = machineGun.Fire();
-                setOwnerOfFiredBullet(bullet);
+                setLayerOfFiredBullet(bullet);
             }
         }
     }
@@ -192,12 +192,11 @@ public class TankScript : MonoBehaviour {
     //     }
     // }
 
-        private void setOwnerOfFiredBullet(GameObject bullet)
+        private void setLayerOfFiredBullet(GameObject bullet)
     {
         if (bullet != null)
         {
-            BulletScript bulletScript = bullet.GetComponent<BulletScript>();
-            bulletScript.owner = gameObject;
+            bullet.layer = gameObject.layer;
         }
     }
 
