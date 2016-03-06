@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ControllerScript : MonoBehaviour
 {
+    public int playerIndex;
     public float agent1Horizontal;
     public float agent1Vertical;
     public float agent1Trigger;
@@ -24,20 +25,20 @@ public class ControllerScript : MonoBehaviour
     }
 
     void Update() {
-        agent1Horizontal = Input.GetAxis("L_XAxis_1");
-        agent1Vertical = Input.GetAxis("L_YAxis_1");
-        agent1Trigger = Input.GetAxis("TriggersL_1");
+        agent1Horizontal = Input.GetAxis("L_XAxis_" + playerIndex);
+        agent1Vertical = Input.GetAxis("L_YAxis_" + playerIndex);
+        agent1Trigger = Input.GetAxis("TriggersL_" + playerIndex);
 
-        agent2Horizontal = Input.GetAxis("R_XAxis_1");
-        agent2Vertical = Input.GetAxis("R_YAxis_1");
-        agent2Trigger = Input.GetAxis("TriggersR_1");
+        agent2Horizontal = Input.GetAxis("R_XAxis_" + playerIndex);
+        agent2Vertical = Input.GetAxis("R_YAxis_" + playerIndex);
+        agent2Trigger = Input.GetAxis("TriggersR_" + playerIndex);
 
-        agent1SwitchHorizontal = Input.GetAxisRaw("DPad_XAxis_1"); // RL
-        agent1SwitchVertical = Input.GetAxisRaw("DPad_YAxis_1"); // UD
+        agent1SwitchHorizontal = Input.GetAxisRaw("DPad_XAxis_" + playerIndex); // RL
+        agent1SwitchVertical = Input.GetAxisRaw("DPad_YAxis_" + playerIndex); // UD
 
-        agent2TurretSelect = Input.GetButton("B_1"); // Right
-        agent2MachineGunSelect = Input.GetButton("X_1"); // Left
-        agent2MoveSelect = Input.GetButton("Y_1"); // Up
-        agent2NullSelect = Input.GetButton("A_1");
+        agent2TurretSelect = Input.GetButton("B_" + playerIndex); // Right
+        agent2MachineGunSelect = Input.GetButton("X_" + playerIndex); // Left
+        agent2MoveSelect = Input.GetButton("Y_" + playerIndex); // Up
+        agent2NullSelect = Input.GetButton("A_" + playerIndex);
     }
 }
