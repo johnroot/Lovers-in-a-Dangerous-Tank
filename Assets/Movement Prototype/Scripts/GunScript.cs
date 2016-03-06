@@ -30,10 +30,12 @@ public class GunScript : MonoBehaviour {
         transform.Rotate(0, 0, rotationSpeed * horizontal * Time.deltaTime);
     }
 
-    public void Fire() {
+    public GameObject Fire() {
         if (timeElapsedSinceFire == fireRate) {
-            Instantiate(turretBullet, transform.position, transform.rotation);
+            GameObject bullet = (GameObject) Instantiate(turretBullet, transform.position, transform.rotation);
             timeElapsedSinceFire = 0;
+            return bullet;
         }
+        return null;
     }
 }

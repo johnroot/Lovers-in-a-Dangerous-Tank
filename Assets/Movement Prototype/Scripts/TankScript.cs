@@ -143,9 +143,12 @@ public class TankScript : MonoBehaviour {
         if (trigger > 0.75f) {
             Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
             if (agent == State.Turret) {
-                turret.Fire();
+                Debug.Log("Agent detected");
+                GameObject bullet = turret.Fire();
+                setOwnerOfFiredBullet(bullet);
             } else if (agent == State.MachineGun) {
-                machineGun.Fire();
+                GameObject bullet = machineGun.Fire();
+                setOwnerOfFiredBullet(bullet);
             }
         }
     }
@@ -175,6 +178,23 @@ public class TankScript : MonoBehaviour {
         } else if (controller.agent2MoveSelect && agent1 != State.Move) {
             Debug.Log("2.Move");
             agent2 = State.Move;
+        }
+    }
+
+    // public void SwitchRoles(State newState, int agentIndex) {
+    //     if (agentIndex == 1) {
+    //         agent1 = newState;
+    //     } else if (agentIndex == 2) {
+    //         agent2 = newState;
+    //     }
+    // }
+
+        private void setOwnerOfFiredBullet(GameObject bullet)
+    {
+        if (bullet != null)
+        {
+            BulletScript bulletScript = bullet.GetComponent<BulletScript>();
+            bulletScript.owner = gameObject;
         }
     }
 

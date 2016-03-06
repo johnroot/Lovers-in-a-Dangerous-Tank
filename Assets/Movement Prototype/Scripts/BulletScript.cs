@@ -11,8 +11,6 @@ public class BulletScript : MonoBehaviour {
 	void Start () {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         rb.AddRelativeForce(new Vector2(0, speed));
-        // Parent of transform gives the weapon. The parent of that is the owner of the bullet.
-        owner = gameObject.transform.parent.transform.parent.gameObject;
 	}
 
     void OnCollisionEnter2D(Collision2D coll) {
