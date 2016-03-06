@@ -47,6 +47,7 @@ public class TankScript : MonoBehaviour {
     {
         if (actor1 == State.Move)
         {
+            Debug.Log("I am here!");
             rb.AddRelativeForce(new Vector2(0, -left_vertical * speed));
             rb.MoveRotation(rb.rotation - left_horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
