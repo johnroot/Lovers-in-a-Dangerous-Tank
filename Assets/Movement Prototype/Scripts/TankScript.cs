@@ -18,173 +18,173 @@ public class TankScript : MonoBehaviour {
 
     GunScript turret;
     GunScript machineGun;
+    ControllerScript controller;
     Rigidbody2D rb;
 
-    float left_horizontal;
-    float left_vertical;
-    float right_horizontal;
-    float right_vertical;
+    // Axes for agents 1 and 2
+    float agent1Horizontal;
+    float agent1Vertical;
+    float agent2Horizontal;
+    float agent2Vertical;
 
-    State actor1;
-    State actor2;
+    State agent1;
+    State agent2;
 
-    void Start()
-    {
+    void Start() {
         turret = transform.GetChild(0).gameObject.GetComponent<GunScript>();
         machineGun = transform.GetChild(1).gameObject.GetComponent<GunScript>();
+        controller = GetComponent<ControllerScript>();
         rb = GetComponent<Rigidbody2D>();
 
-        left_horizontal = 0;
-        left_vertical = 0;
-        right_horizontal = 0;
-        right_vertical = 0;
+        agent1Horizontal = 0;
+        agent1Vertical = 0;
+        agent2Horizontal = 0;
+        agent2Vertical = 0;
 
-        actor1 = State.Move;
-        actor2 = State.Null;
+        agent1 = State.Move;
+        agent2 = State.Null;
     }
 
-    void FixedUpdate()
-    {
-        if (actor1 == State.Move)
-        {
-            Debug.Log("I am here!");
-            rb.AddRelativeForce(new Vector2(0, -left_vertical * speed));
-            rb.MoveRotation(rb.rotation - left_horizontal * rotationSpeed * Time.fixedDeltaTime);
+    void FixedUpdate() {
+        if (agent1 == State.Move) {
+            rb.AddRelativeForce(new Vector2(0, -agent1Vertical * speed));
+            rb.MoveRotation(rb.rotation - agent1Horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
 
-        if (actor2 == State.Move)
-        {
-            rb.AddRelativeForce(new Vector2(0, -right_vertical * speed));
-            rb.MoveRotation(rb.rotation - right_horizontal * rotationSpeed * Time.fixedDeltaTime);
+        if (agent2 == State.Move) {
+            rb.AddRelativeForce(new Vector2(0, -agent2Vertical * speed));
+            rb.MoveRotation(rb.rotation - agent2Horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
     }
 
-    void Update()
-    {
-        ControllerScript controller = GetComponent<ControllerScript>();
-        // Handle the input for actor1
-        switch (actor1)
-        {
-            case State.Null: break;
-            case State.Move: Steer(controller.actor1Horizontal, 1); Accelerate(controller.actor1Vertical, 1); break;
-            case State.Turret: RotateTurret(controller.actor1Horizontal, 1); FireGun(controller.actor1Trigger, 1); break;
-            case State.MachineGun: RotateTurret(controller.actor1Horizontal, 1); FireGun(controller.actor1Trigger, 1); break;
+    void Update() {
+        // Handle the input for agent1
+        switch (agent1) {
+            case State.Null:
+                break;
+            case State.Move:
+                Steer(controller.agent1Horizontal, 1);
+                Accelerate(controller.agent1Vertical, 1);
+                break;
+            case State.Turret:
+                RotateTurret(controller.agent1Horizontal, 1);
+                FireGun(controller.agent1Trigger, 1);
+                break;
+            case State.MachineGun:
+                RotateTurret(controller.agent1Horizontal, 1);
+                FireGun(controller.agent1Trigger, 1);
+                break;
         }
 
-        // Handle the input for actor2
-        switch (actor2)
-        {
-            case State.Null: break;
-            case State.Move: Steer(controller.actor2Horizontal, 2); Accelerate(controller.actor2Vertical, 2); break;
-            case State.Turret: RotateTurret(controller.actor2Horizontal, 2); FireGun(controller.actor2Trigger, 2); break; ;
-            case State.MachineGun: RotateTurret(controller.actor2Horizontal, 2); FireGun(controller.actor2Trigger, 2); break;
+        // Handle the input for agent2
+        switch (agent2) {
+            case State.Null:
+                break;
+            case State.Move:
+                Steer(controller.agent2Horizontal, 2);
+                Accelerate(controller.agent2Vertical, 2);
+                break;
+            case State.Turret:
+                RotateTurret(controller.agent2Horizontal, 2);
+                FireGun(controller.agent2Trigger, 2);
+                break;
+            case State.MachineGun:
+                RotateTurret(controller.agent2Horizontal, 2);
+                FireGun(controller.agent2Trigger, 2);
+                break;
         }
+        SwitchRoles();
     }
 
-    public void Steer(float horizontal, int agentIndex)
-    {
-        if (agentIndex == 1)
-        {
-            if (actor1 == State.Move)
-            {
-                left_horizontal = horizontal;
+    public void Steer(float horizontal, int agentIndex) {
+        if (agentIndex == 1) {
+            if (agent1 == State.Move) {
+                agent1Horizontal = horizontal;
             }
-        }
-        else if (agentIndex == 2)
-        {
-            if (actor2 == State.Move)
-            {
-                right_horizontal = horizontal;
-            }
-        }
-    }
-
-    public void Accelerate(float vertical, int agentIndex)
-    {
-        if (agentIndex == 1)
-        {
-            if (actor1 == State.Move)
-            {
-                left_vertical = vertical;
-            }
-        }
-        else if (agentIndex == 2)
-        {
-            if (actor2 == State.Move)
-            {
-                right_vertical = vertical;
+        } else if (agentIndex == 2) {
+            if (agent2 == State.Move) {
+                agent2Horizontal = horizontal;
             }
         }
     }
 
-    public void RotateTurret(float horizontal, int agentIndex)
-    {
-        if (agentIndex == 1)
-        {
-            if (actor1 == State.Turret)
-            {
-                turret.Rotate(horizontal);
-            }
-            else if (actor1 == State.MachineGun)
-            {
-                machineGun.Rotate(horizontal);
+    public void Accelerate(float vertical, int agentIndex) {
+        if (agentIndex == 1) {
+            if (agent1 == State.Move) {
+                agent1Vertical = vertical;
             }
         }
-        else if (agentIndex == 2)
-        {
-            if (actor2 == State.Turret)
-            {
-                turret.Rotate(horizontal);
-            }
-            else if (actor2 == State.MachineGun)
-            {
-                machineGun.Rotate(horizontal);
+        else if (agentIndex == 2) {
+            if (agent2 == State.Move) {
+                agent2Vertical = vertical;
             }
         }
     }
 
-    public void FireGun(float trigger, int agentIndex)
-    {
-        if (agentIndex == 1)
-        {
-            if (trigger > 0.75f)
-            {
-                if (actor1 == State.Turret)
-                {
-                    turret.Fire();
-                }
-                else if (actor1 == State.MachineGun)
-                {
-                    machineGun.Fire();
-                }
-            }
+    public void RotateTurret(float horizontal, int agentIndex) {
+        State agent = getAgent(agentIndex);
+        if (agent == State.Turret) {
+            turret.Rotate(horizontal);
+        } else if (agent == State.MachineGun) {
+            machineGun.Rotate(horizontal);
         }
-        else if (agentIndex == 2)
-        {
-            if (trigger > 0.75f)
-            {
-                if (actor2 == State.Turret)
-                {
-                    turret.Fire();
-                }
-                else if (actor2 == State.MachineGun)
-                {
-                    machineGun.Fire();
-                }
+    }
+
+    public void FireGun(float trigger, int agentIndex) {
+        State agent = getAgent(agentIndex);
+        Debug.Log("Firing with agent: " + agentIndex);
+        Debug.Log(trigger);
+        if (trigger > 0.75f) {
+            Debug.Log("Trigger detected");
+            if (agent == State.Turret) {
+                turret.Fire();
+            } else if (agent == State.MachineGun) {
+                machineGun.Fire();
             }
         }
     }
 
-    public void SwitchRoles(State newState, int agentIndex)
-    {
-        if (agentIndex == 1)
-        {
-            actor1 = newState;
+    public void SwitchRoles() {
+        // Handle role switching for left hand
+        if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret) {
+            Debug.Log("1.Turret");
+            agent1 = State.Turret;
+        } else if (controller.agent1SwitchHorizontal == -1.0f && agent2 != State.MachineGun) {
+            Debug.Log("1.MachineGun");
+            agent1 = State.MachineGun;
+        } else if (controller.agent1SwitchVertical == 1.0f && agent2 != State.Move) {
+            Debug.Log("1.Move");
+            agent1 = State.Move;
         }
-        else if (agentIndex == 2)
-        {
-            actor2 = newState;
-        } 
+
+        // Handle role switching for right hand
+        if (controller.agent2TurretSelect && agent1 != State.Turret) {
+            Debug.Log("2.Turret");
+            agent2 = State.Turret;
+        } else if (controller.agent2MachineGunSelect && agent1 != State.MachineGun) {
+            Debug.Log("2.MachineGun");
+            agent2 = State.MachineGun;
+        } else if (controller.agent2MoveSelect && agent1 != State.Move) {
+            Debug.Log("2.Move");
+            agent2 = State.Move;
+        }
+    }
+
+    // public void SwitchRoles(State newState, int agentIndex) {
+    //     if (agentIndex == 1) {
+    //         agent1 = newState;
+    //     } else if (agentIndex == 2) {
+    //         agent2 = newState;
+    //     }
+    // }
+
+    private State getAgent(int agentIndex) {
+        if (agentIndex == 1) {
+            return agent1;
+        } else if (agentIndex == 2) {
+            return agent2;
+        }
+        return State.Null;
     }
 
 }
