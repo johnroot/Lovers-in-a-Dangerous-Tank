@@ -9,6 +9,7 @@ public class HealthScript : MonoBehaviour {
 
     public void DecreaseHealth(float damage)
     {
+        Debug.Log("Decreasing health");
         health -= damage;
         if (health <= 0)
         {

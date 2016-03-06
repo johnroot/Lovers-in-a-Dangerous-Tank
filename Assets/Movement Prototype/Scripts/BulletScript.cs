@@ -9,17 +9,19 @@ public class BulletScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        Debug.Log("Bullet created");
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         rb.AddRelativeForce(new Vector2(0, speed));
 	}
 
     void OnCollisionEnter2D(Collision2D coll) {
-        if (coll.gameObject != owner) {
+        Debug.Log("Colliding with something.");
+        //if (coll.gameObject != owner) {
             HealthScript healthScript = coll.gameObject.GetComponent<HealthScript>();
             if (healthScript != null) {
                 healthScript.DecreaseHealth(damage);
             }
-        }
+        //}
         Destroy(gameObject);
     }
 
