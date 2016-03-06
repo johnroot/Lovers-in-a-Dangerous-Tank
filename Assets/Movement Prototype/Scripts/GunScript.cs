@@ -16,7 +16,9 @@ public class GunScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        timeElapsedSinceFire++;
+        if (timeElapsedSinceFire < fireRate) {
+            timeElapsedSinceFire++;
+        }
 	}
 
     /**
@@ -29,7 +31,7 @@ public class GunScript : MonoBehaviour {
     }
 
     public void Fire() {
-        if (timeElapsedSinceFire < fireRate) {
+        if (timeElapsedSinceFire == fireRate) {
             Instantiate(turretBullet, transform.position, transform.rotation);
             timeElapsedSinceFire = 0;
         }

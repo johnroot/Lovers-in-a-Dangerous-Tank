@@ -132,11 +132,10 @@ public class TankScript : MonoBehaviour {
 
     public void FireGun(float trigger, int agentIndex) {
         State agent = getAgent(agentIndex);
-        Debug.Log("Firing with agent: " + agentIndex);
-        Debug.Log(trigger);
         if (trigger > 0.75f) {
-            Debug.Log("Trigger detected");
+            Debug.Log("Trigger detected: " + trigger);
             if (agent == State.Turret) {
+                Debug.Log("Agent detected");
                 turret.Fire();
             } else if (agent == State.MachineGun) {
                 machineGun.Fire();
