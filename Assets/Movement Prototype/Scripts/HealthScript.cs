@@ -9,7 +9,11 @@ public class HealthScript : MonoBehaviour {
 
     public void DecreaseHealth(float damage)
     {
-        health = System.Math.Max(0, health - damage);
+        health -= damage;
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void UpdateHealthBar()
