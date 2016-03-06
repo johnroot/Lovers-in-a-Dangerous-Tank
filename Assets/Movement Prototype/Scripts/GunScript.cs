@@ -6,12 +6,15 @@ public class GunScript : MonoBehaviour {
     public float rotationSpeed;
     public float fireRate;
     public GameObject turretBullet;
-    public int ammo;
+    public int maxAmmo;
+    public int reloadAmount;
+    int currentAmmo;
 
     int timeElapsedSinceFire = 0;
 
 	// Use this for initialization
 	void Start () {
+        currentAmmo = maxAmmo;
 	}
 
 	// Update is called once per frame
@@ -31,11 +34,18 @@ public class GunScript : MonoBehaviour {
     }
 
     public GameObject Fire() {
-        if (timeElapsedSinceFire == fireRate) {
+        if (timeElapsedSinceFire == fireRate && currentAmmo > 0) {
             GameObject bullet = (GameObject) Instantiate(turretBullet, transform.position, transform.rotation);
             timeElapsedSinceFire = 0;
             return bullet;
         }
         return null;
+    }
+
+    public void Reload() {
+        currentAmmo += reloadAmount;
+        if (currentAmmo > maxAmmo) {
+            currentAmmo = maxAmmo;
+        }
     }
 }

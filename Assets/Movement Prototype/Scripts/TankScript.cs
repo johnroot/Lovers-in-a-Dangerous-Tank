@@ -68,14 +68,10 @@ public class TankScript : MonoBehaviour {
                 Accelerate(controller.agent1Vertical, 1);
                 break;
             case State.Turret:
-                Debug.Log("Agent 1 is turreting");
-                RotateTurret(controller.agent1Horizontal, 1);
-                FireGun(controller.agent1Trigger, 1);
-                break;
             case State.MachineGun:
-                Debug.Log("Agent 1 is machine gunning");
                 RotateTurret(controller.agent1Horizontal, 1);
                 FireGun(controller.agent1Trigger, 1);
+                ReloadGun(controller.agent1Reload, 1);
                 break;
         }
 
@@ -84,19 +80,15 @@ public class TankScript : MonoBehaviour {
             case State.Null:
                 break;
             case State.Move:
-                Debug.Log("Agent 1 is moving");
+                Debug.Log("Agent 2 is moving");
                 Steer(controller.agent2Horizontal, 2);
                 Accelerate(controller.agent2Vertical, 2);
                 break;
             case State.Turret:
-                Debug.Log("Agent 1 is turreting");
-                RotateTurret(controller.agent2Horizontal, 2);
-                FireGun(controller.agent2Trigger, 2);
-                break;
             case State.MachineGun:
-                Debug.Log("Agent 1 is machine gunning");
                 RotateTurret(controller.agent2Horizontal, 2);
                 FireGun(controller.agent2Trigger, 2);
+                ReloadGun(controller.agent2Reload, 2);
                 break;
         }
         SwitchRoles();
@@ -149,6 +141,17 @@ public class TankScript : MonoBehaviour {
             } else if (agent == State.MachineGun) {
                 GameObject bullet = machineGun.Fire();
                 setOwnerOfFiredBullet(bullet);
+            }
+        }
+    }
+
+    public void ReloadGun(bool reloadTriggered, int agentIndex) {
+        if (reloadTriggered) {
+            State agent = getAgent(agentIndex);
+            if (agent == State.Turret) {
+                turret.Reload();
+            } else if (agent == State.MachineGun) {
+                machineGun.Reload();
             }
         }
     }

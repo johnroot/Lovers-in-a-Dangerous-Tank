@@ -21,6 +21,9 @@ public class ControllerScript : MonoBehaviour
     public bool agent2MoveSelect;
     public bool agent2NullSelect;
 
+    public bool agent1Reload;
+    public bool agent2Reload;
+
     void Start() {
     }
 
@@ -40,5 +43,8 @@ public class ControllerScript : MonoBehaviour
         agent2MachineGunSelect = Input.GetButton("X_" + playerIndex); // Left
         agent2MoveSelect = Input.GetButton("Y_" + playerIndex); // Up
         agent2NullSelect = Input.GetButton("A_" + playerIndex);
+
+        agent1Reload = Input.GetButton("LB_" + playerIndex);
+        agent2Reload = Input.GetButton("RB_" + playerIndex);
     }
 }
