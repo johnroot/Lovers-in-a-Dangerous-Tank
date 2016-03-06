@@ -63,14 +63,17 @@ public class TankScript : MonoBehaviour {
             case State.Null:
                 break;
             case State.Move:
+                Debug.Log("Agent 1 is moving");
                 Steer(controller.agent1Horizontal, 1);
                 Accelerate(controller.agent1Vertical, 1);
                 break;
             case State.Turret:
+                Debug.Log("Agent 1 is turreting");
                 RotateTurret(controller.agent1Horizontal, 1);
                 FireGun(controller.agent1Trigger, 1);
                 break;
             case State.MachineGun:
+                Debug.Log("Agent 1 is machine gunning");
                 RotateTurret(controller.agent1Horizontal, 1);
                 FireGun(controller.agent1Trigger, 1);
                 break;
@@ -81,14 +84,17 @@ public class TankScript : MonoBehaviour {
             case State.Null:
                 break;
             case State.Move:
+                Debug.Log("Agent 1 is moving");
                 Steer(controller.agent2Horizontal, 2);
                 Accelerate(controller.agent2Vertical, 2);
                 break;
             case State.Turret:
+                Debug.Log("Agent 1 is turreting");
                 RotateTurret(controller.agent2Horizontal, 2);
                 FireGun(controller.agent2Trigger, 2);
                 break;
             case State.MachineGun:
+                Debug.Log("Agent 1 is machine gunning");
                 RotateTurret(controller.agent2Horizontal, 2);
                 FireGun(controller.agent2Trigger, 2);
                 break;
@@ -124,8 +130,10 @@ public class TankScript : MonoBehaviour {
     public void RotateTurret(float horizontal, int agentIndex) {
         State agent = getAgent(agentIndex);
         if (agent == State.Turret) {
+            Debug.Log("Rotating TURRET for agent: " + agentIndex);
             turret.Rotate(horizontal);
         } else if (agent == State.MachineGun) {
+            Debug.Log("Rotating MACHINEGUN for agent: " + agentIndex);
             machineGun.Rotate(horizontal);
         }
     }
@@ -133,9 +141,8 @@ public class TankScript : MonoBehaviour {
     public void FireGun(float trigger, int agentIndex) {
         State agent = getAgent(agentIndex);
         if (trigger > 0.75f) {
-            Debug.Log("Trigger detected: " + trigger);
+            Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
             if (agent == State.Turret) {
-                Debug.Log("Agent detected");
                 turret.Fire();
             } else if (agent == State.MachineGun) {
                 machineGun.Fire();
@@ -145,6 +152,8 @@ public class TankScript : MonoBehaviour {
 
     public void SwitchRoles() {
         // Handle role switching for left hand
+        Debug.Log("horizontal" + controller.agent1SwitchHorizontal);
+        Debug.Log("Vertical" + controller.agent1SwitchVertical);
         if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret) {
             Debug.Log("1.Turret");
             agent1 = State.Turret;
@@ -168,14 +177,6 @@ public class TankScript : MonoBehaviour {
             agent2 = State.Move;
         }
     }
-
-    // public void SwitchRoles(State newState, int agentIndex) {
-    //     if (agentIndex == 1) {
-    //         agent1 = newState;
-    //     } else if (agentIndex == 2) {
-    //         agent2 = newState;
-    //     }
-    // }
 
     private State getAgent(int agentIndex) {
         if (agentIndex == 1) {

@@ -15,17 +15,13 @@ public class BulletScript : MonoBehaviour {
         owner = gameObject.transform.parent.transform.parent.gameObject;
 	}
 
-    void OnCollisionEnter2D(Collision2D coll)
-    {
-        if (coll.gameObject != owner)
-        {
+    void OnCollisionEnter2D(Collision2D coll) {
+        if (coll.gameObject != owner) {
             HealthScript healthScript = coll.gameObject.GetComponent<HealthScript>();
-            if (healthScript != null)
-            {
+            if (healthScript != null) {
                 healthScript.DecreaseHealth(damage);
             }
         }
-
         Destroy(gameObject);
     }
 
