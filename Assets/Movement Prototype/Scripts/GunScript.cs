@@ -24,11 +24,11 @@ public class GunScript : MonoBehaviour {
      * Rotate turret based on the horizontal
      * @param horizontal - horizontal axis position
      */
-    void Rotate (float horizontal) {
+    public void Rotate (float horizontal) {
         transform.Rotate(0, 0, rotationSpeed * horizontal * Time.deltaTime);
     }
 
-    void Fire() {
+    public void Fire() {
         if (timeElapsedSinceFire < fireRate) {
             Instantiate(turretBullet, transform.position, transform.rotation);
             timeElapsedSinceFire = 0;
