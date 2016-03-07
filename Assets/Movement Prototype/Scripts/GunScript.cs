@@ -7,6 +7,7 @@ public class GunScript : MonoBehaviour {
     public float fireRate;
     public GameObject turretBullet;
     public int ammo;
+	public float barrelLength;
 
     int timeElapsedSinceFire = 0;
 
@@ -32,7 +33,9 @@ public class GunScript : MonoBehaviour {
 
     public void Fire() {
 		if (timeElapsedSinceFire == fireRate) {
-			Instantiate(turretBullet, transform.position, transform.rotation);
+			//spawn a bullet at the end of the barrel
+			Vector3 barrelEnd = transform.position + Quaternion.Euler(transform.eulerAngles) * new Vector3(-barrelLength, 0, 0);
+			Instantiate(turretBullet, barrelEnd, transform.rotation);
             timeElapsedSinceFire = 0;
         }
     }
