@@ -6,6 +6,7 @@ public class BulletScript : MonoBehaviour {
     public float speed;
     public float damage;
     public GameObject owner;
+	public Sprite sprite;
 
 	// Use this for initialization
 	void Start () {
@@ -25,7 +26,6 @@ public class BulletScript : MonoBehaviour {
                 healthScript.DecreaseHealth(damage);
             }
         }
-
         Destroy(gameObject);
     }
 

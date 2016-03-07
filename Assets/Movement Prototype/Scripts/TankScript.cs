@@ -47,12 +47,12 @@ public class TankScript : MonoBehaviour {
 
     void FixedUpdate() {
         if (agent1 == State.Move) {
-            rb.AddRelativeForce(new Vector2(0, -agent1Vertical * speed));
+			rb.AddRelativeForce(new Vector2(-agent1Vertical * speed, 0));
             rb.MoveRotation(rb.rotation - agent1Horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
 
         if (agent2 == State.Move) {
-            rb.AddRelativeForce(new Vector2(0, -agent2Vertical * speed));
+			rb.AddRelativeForce(new Vector2(-agent2Vertical * speed, 0));
             rb.MoveRotation(rb.rotation - agent2Horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
     }

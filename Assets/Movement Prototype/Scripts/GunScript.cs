@@ -31,8 +31,8 @@ public class GunScript : MonoBehaviour {
     }
 
     public void Fire() {
-        if (timeElapsedSinceFire == fireRate) {
-            Instantiate(turretBullet, transform.position, transform.rotation);
+		if (timeElapsedSinceFire == fireRate) {
+			Instantiate(turretBullet, transform.position, transform.rotation);
             timeElapsedSinceFire = 0;
         }
     }
