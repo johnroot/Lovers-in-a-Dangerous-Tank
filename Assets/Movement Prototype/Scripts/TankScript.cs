@@ -134,7 +134,7 @@ public class TankScript : MonoBehaviour {
         State agent = getAgent(agentIndex);
         if (trigger > 0.75f) {
             Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
-            if (agent == State.Turret) {
+			if (agent == State.Turret) {
                 Debug.Log("Agent detected");
                 GameObject bullet = turret.Fire();
                 setLayerOfFiredBullet(bullet);

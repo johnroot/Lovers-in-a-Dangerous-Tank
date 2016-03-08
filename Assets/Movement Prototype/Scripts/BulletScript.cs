@@ -11,8 +11,7 @@ public class BulletScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        rb.AddRelativeForce(new Vector2(-speed, 0));
-		transform.Rotate (0, 0, 90);
+		rb.AddRelativeForce(new Vector2(0, speed));
 	}
 
     void OnCollisionEnter2D(Collision2D coll) {
@@ -20,7 +19,6 @@ public class BulletScript : MonoBehaviour {
         if (healthScript != null) {
             healthScript.DecreaseHealth(damage);
         }
-		Instantiate (explosionAnimation, transform.position, transform.rotation);
         Destroy (gameObject);
     }
 

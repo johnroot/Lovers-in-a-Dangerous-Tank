@@ -5,7 +5,7 @@ public class GunScript : MonoBehaviour {
 
     public float rotationSpeed;
     public float fireRate;
-    public GameObject turretBullet;
+    public GameObject bullet;
     public int maxAmmo;
     public int reloadAmount;
     int currentAmmo;
@@ -33,21 +33,20 @@ public class GunScript : MonoBehaviour {
     public void Rotate (float horizontal) {
         transform.Rotate(0, 0, rotationSpeed * horizontal * Time.deltaTime);
     }
-
     public GameObject Fire() {
 		if (timeElapsedSinceFire == fireRate && currentAmmo > 0) {
 			Vector3 barrelEnd = transform.position +
 			                    (Quaternion.Euler (transform.eulerAngles) * new Vector3 (-barrelLength, 0, 0));
-			GameObject bullet = (GameObject)Instantiate (turretBullet, barrelEnd, transform.rotation);
+			GameObject bulletInstance = (GameObject)Instantiate (bullet, barrelEnd, transform.rotation);
 			timeElapsedSinceFire = 0;
-			return bullet;
+			return bulletInstance;
 		}
 		return null;
 	}
     public void Reload() {
-        currentAmmo += reloadAmount;
-        if (currentAmmo > maxAmmo) {
-            currentAmmo = maxAmmo;
-        }
-    }
+		currentAmmo += reloadAmount;
+		if (currentAmmo > maxAmmo) {
+			currentAmmo = maxAmmo;
+		}
+	}
 }
