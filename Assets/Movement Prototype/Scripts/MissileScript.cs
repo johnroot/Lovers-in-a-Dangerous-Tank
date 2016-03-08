@@ -5,6 +5,7 @@ public class MissileScript: MonoBehaviour
 {
     public float speed;
 	int life;
+	public float damage;
 	public GameObject explosionAnimation;
 
 
@@ -19,10 +20,10 @@ public class MissileScript: MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D coll)
 	{
-        if (coll.gameObject.tag == gameObject.tag)
-        {
-            Destroy(coll.gameObject);
-        }
+		HealthScript healthScript = coll.gameObject.GetComponent<HealthScript>();
+		if (healthScript != null) {
+			healthScript.DecreaseHealth(damage);
+		}
 		SpawnDeathAnimation ();
         Destroy(gameObject);
     }
@@ -32,6 +33,7 @@ public class MissileScript: MonoBehaviour
         life++;
         if (life > 200)
         {
+			SpawnDeathAnimation ();
             Destroy(gameObject);
         }
     }

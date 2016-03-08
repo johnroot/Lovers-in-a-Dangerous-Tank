@@ -39,8 +39,10 @@ public class GunScript : MonoBehaviour {
 			                    (Quaternion.Euler (transform.eulerAngles) * new Vector3 (-barrelLength, 0, 0));
 			GameObject bulletInstance = (GameObject)Instantiate (bullet, barrelEnd, transform.rotation);
 			timeElapsedSinceFire = 0;
+			print ("fire");
 			return bulletInstance;
 		}
+		print ("not fired "+currentAmmo);
 		return null;
 	}
     public void Reload() {

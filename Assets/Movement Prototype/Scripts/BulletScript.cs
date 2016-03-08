@@ -6,7 +6,6 @@ public class BulletScript : MonoBehaviour {
     public float speed;
     public float damage;
     public GameObject owner;
-	public GameObject explosionAnimation;
 
 	// Use this for initialization
 	void Start () {
