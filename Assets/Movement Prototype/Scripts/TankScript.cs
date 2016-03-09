@@ -32,11 +32,14 @@ public class TankScript : MonoBehaviour {
     State agent1;
     State agent2;
 
+    AudioSource audioSource;
+
     void Start() {
         turret = transform.Find("Turret").gameObject.GetComponent<GunScript>();
         machineGun = transform.Find("MachineGun").gameObject.GetComponent<GunScript>();
         controller = GetComponent<ControllerScript>();
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
 
         agent1Horizontal = 0;
         agent1Vertical = 0;
@@ -50,13 +53,15 @@ public class TankScript : MonoBehaviour {
     void FixedUpdate() {
         if (agent1 == State.Move) {
 			rb.AddRelativeForce(new Vector2(agent1Vertical * speed, 0));
-            rb.MoveRotation(rb.rotation - agent1Horizontal * rotationSpeed * Time.fixedDeltaTime);
+            rb.AddTorque(-agent1Horizontal * rotationSpeed);
         }
 
         if (agent2 == State.Move) {
 			rb.AddRelativeForce(new Vector2(agent2Vertical * speed, 0));
-            rb.MoveRotation(rb.rotation - agent2Horizontal * rotationSpeed * Time.fixedDeltaTime);
+            rb.AddTorque(-agent2Horizontal * rotationSpeed);
         }
+        
+        audioSource.volume = rb.velocity.magnitude / (speed * 2) + Mathf.Abs(rb.angularVelocity) / 1000;
     }
 
     void Update() {
