@@ -6,6 +6,7 @@ public class HealthScript : MonoBehaviour {
     public float maxHealth = 100f;
     public float health = 100f;
     public GameObject healthBar;
+	public GameObject deathAnimation;
 
     public void DecreaseHealth(float damage)
     {
@@ -16,6 +17,7 @@ public class HealthScript : MonoBehaviour {
         }
         if (health <= 0)
         {
+			Instantiate (deathAnimation, transform.position, transform.rotation);
             Destroy(gameObject);
         }
     }
