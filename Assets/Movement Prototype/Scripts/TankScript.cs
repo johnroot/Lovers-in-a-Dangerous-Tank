@@ -12,6 +12,8 @@ public class TankScript : MonoBehaviour {
 
     public GameObject turretBullet;
     public GameObject machineGunBullet;
+    public GameObject OperatorL;
+    public GameObject OperatorR;
 
     int turretReload;
     int machineGunReload;
@@ -47,12 +49,12 @@ public class TankScript : MonoBehaviour {
 
     void FixedUpdate() {
         if (agent1 == State.Move) {
-			rb.AddRelativeForce(new Vector2(-agent1Vertical * speed, 0));
+			rb.AddRelativeForce(new Vector2(agent1Vertical * speed, 0));
             rb.MoveRotation(rb.rotation - agent1Horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
 
         if (agent2 == State.Move) {
-			rb.AddRelativeForce(new Vector2(-agent2Vertical * speed, 0));
+			rb.AddRelativeForce(new Vector2(agent2Vertical * speed, 0));
             rb.MoveRotation(rb.rotation - agent2Horizontal * rotationSpeed * Time.fixedDeltaTime);
         }
     }
@@ -162,24 +164,30 @@ public class TankScript : MonoBehaviour {
         if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret) {
             Debug.Log("1.Turret");
             agent1 = State.Turret;
+            OperatorL.transform.localPosition = new Vector3(-15,2);
         } else if (controller.agent1SwitchHorizontal == -1.0f && agent2 != State.MachineGun) {
             Debug.Log("1.MachineGun");
             agent1 = State.MachineGun;
+            OperatorL.transform.localPosition = new Vector3(-95, 50);
         } else if (controller.agent1SwitchVertical == 1.0f && agent2 != State.Move) {
             Debug.Log("1.Move");
             agent1 = State.Move;
+            OperatorL.transform.localPosition = new Vector3(-95, -35);
         }
 
         // Handle role switching for right hand
         if (controller.agent2TurretSelect && agent1 != State.Turret) {
             Debug.Log("2.Turret");
             agent2 = State.Turret;
+            OperatorR.transform.localPosition = new Vector3(-15, 2);
         } else if (controller.agent2MachineGunSelect && agent1 != State.MachineGun) {
             Debug.Log("2.MachineGun");
             agent2 = State.MachineGun;
+            OperatorR.transform.localPosition = new Vector3(-95, 50);
         } else if (controller.agent2MoveSelect && agent1 != State.Move) {
             Debug.Log("2.Move");
             agent2 = State.Move;
+            OperatorR.transform.localPosition = new Vector3(-95, -35);
         }
     }
 
