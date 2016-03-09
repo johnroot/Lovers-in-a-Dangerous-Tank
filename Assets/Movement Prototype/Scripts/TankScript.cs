@@ -44,7 +44,7 @@ public class TankScript : MonoBehaviour {
         agent2Vertical = 0;
 
         agent1 = State.Move;
-        agent2 = State.Null;
+        agent2 = State.MachineGun;
     }
 
     void FixedUpdate() {
