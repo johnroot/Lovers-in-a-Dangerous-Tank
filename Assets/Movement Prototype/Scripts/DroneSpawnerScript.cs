@@ -19,9 +19,9 @@ public class DroneSpawnerScript : MonoBehaviour {
     {
         if (timeSincePreviousSpawn == spawnRate)
         {
-            GameObject drone = (GameObject) Instantiate(drone, transform.position, transform.rotation);
+            GameObject droneInstance = (GameObject) Instantiate(drone, transform.position, transform.rotation);
             timeSincePreviousSpawn = 0;
-            return drone;
+            return droneInstance;
         }
         return null;
     }
