@@ -31,8 +31,8 @@ public class TankScript : MonoBehaviour {
     State agent2;
 
     void Start() {
-        turret = transform.GetChild(0).gameObject.GetComponent<GunScript>();
-        machineGun = transform.GetChild(1).gameObject.GetComponent<GunScript>();
+        turret = transform.Find("Turret").gameObject.GetComponent<GunScript>();
+        machineGun = transform.Find("MachineGun").gameObject.GetComponent<GunScript>();
         controller = GetComponent<ControllerScript>();
         rb = GetComponent<Rigidbody2D>();
 
@@ -63,7 +63,7 @@ public class TankScript : MonoBehaviour {
             case State.Null:
                 break;
             case State.Move:
-                Debug.Log("Agent 1 is moving");
+                // Debug.Log("Agent 1 is moving");
                 Steer(controller.agent1Horizontal, 1);
                 Accelerate(controller.agent1Vertical, 1);
                 break;
@@ -80,7 +80,7 @@ public class TankScript : MonoBehaviour {
             case State.Null:
                 break;
             case State.Move:
-                Debug.Log("Agent 2 is moving");
+                // Debug.Log("Agent 2 is moving");
                 Steer(controller.agent2Horizontal, 2);
                 Accelerate(controller.agent2Vertical, 2);
                 break;
@@ -122,11 +122,12 @@ public class TankScript : MonoBehaviour {
     public void RotateTurret(float horizontal, int agentIndex) {
         State agent = getAgent(agentIndex);
         if (agent == State.Turret) {
-            Debug.Log("Rotating TURRET for agent: " + agentIndex);
             turret.Rotate(horizontal);
         } else if (agent == State.MachineGun) {
-            Debug.Log("Rotating MACHINEGUN for agent: " + agentIndex);
             machineGun.Rotate(horizontal);
+        }
+        if (horizontal != 0) {
+            Debug.Log("Rotating " + agent + " for agent: " + agentIndex);
         }
     }
 
@@ -158,8 +159,6 @@ public class TankScript : MonoBehaviour {
 
     public void SwitchRoles() {
         // Handle role switching for left hand
-        Debug.Log("horizontal" + controller.agent1SwitchHorizontal);
-        Debug.Log("Vertical" + controller.agent1SwitchVertical);
         if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret) {
             Debug.Log("1.Turret");
             agent1 = State.Turret;
@@ -184,16 +183,7 @@ public class TankScript : MonoBehaviour {
         }
     }
 
-    // public void SwitchRoles(State newState, int agentIndex) {
-    //     if (agentIndex == 1) {
-    //         agent1 = newState;
-    //     } else if (agentIndex == 2) {
-    //         agent2 = newState;
-    //     }
-    // }
-
-        private void setLayerOfFiredBullet(GameObject bullet)
-    {
+    private void setLayerOfFiredBullet(GameObject bullet) {
         if (bullet != null)
         {
             bullet.layer = gameObject.layer;
