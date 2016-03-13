@@ -3,7 +3,7 @@ using System.Collections;
 
 public class TankScript : MonoBehaviour {
 
-    public enum State { Null, Move, Turret, MachineGun };
+    public enum State { Null, Move, Turret, MachineGun, SpawnDrone };
 
     public float speed;
     public float rotationSpeed;
@@ -20,6 +20,7 @@ public class TankScript : MonoBehaviour {
 
     GunScript turret;
     GunScript machineGun;
+    DroneSpawnerScript droneSpawner;
     ControllerScript controller;
     Rigidbody2D rb;
 
@@ -160,6 +161,19 @@ public class TankScript : MonoBehaviour {
                 turret.Reload();
             } else if (agent == State.MachineGun) {
                 machineGun.Reload();
+            }
+        }
+    }
+
+    public void SpawnDrone(bool spawningTriggered, int agentIndex)
+    {
+        if (spawningTriggered)
+        {
+            State agent = getAgent(agentIndex);
+            if (agent == State.SpawnDrone)
+            {
+                GameObject drone = droneSpawner.SpawnDrone();
+                drone.layer = LayerMask.NameToLayer("Player" + controller.playerIndex + "Drone"); // e.g. Player1Drone
             }
         }
     }
