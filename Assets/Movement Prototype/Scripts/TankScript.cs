@@ -32,6 +32,10 @@ public class TankScript : MonoBehaviour {
     State agent1;
     State agent2;
 
+	float friction = 1f;
+	Vector2 agent1CurrentVel = Vector2.zero;
+	Vector2 agent2CurrentVel = Vector2.zero;
+
     AudioSource audioSource;
 
     void Start() {
@@ -52,13 +56,15 @@ public class TankScript : MonoBehaviour {
 
     void FixedUpdate() {
         if (agent1 == State.Move) {
-			rb.AddRelativeForce(new Vector2(agent1Vertical * speed, 0));
-            rb.AddTorque(-agent1Horizontal * rotationSpeed);
+			agent1CurrentVel = Vector2.Lerp(agent1CurrentVel, new Vector2 (agent1Vertical * speed, 0), friction*friction);
+			rb.AddRelativeForce(agent1CurrentVel);
+			rb.AddTorque(-agent1Horizontal * rotationSpeed);
         }
 
         if (agent2 == State.Move) {
-			rb.AddRelativeForce(new Vector2(agent2Vertical * speed, 0));
-            rb.AddTorque(-agent2Horizontal * rotationSpeed);
+			agent2CurrentVel = Vector2.Lerp(agent2CurrentVel, new Vector2 (agent2Vertical * speed, 0), friction*friction);
+			rb.AddRelativeForce(agent2CurrentVel);
+			rb.AddTorque(-agent2Horizontal * rotationSpeed * 1/friction);
         }
         
         audioSource.volume = rb.velocity.magnitude / (speed * 2) + Mathf.Abs(rb.angularVelocity) / 1000;
@@ -212,4 +218,11 @@ public class TankScript : MonoBehaviour {
         return State.Null;
     }
 
+	//for handling friciton on different surfaces
+	private void OnTriggerEnter2D(Collider2D other) {
+		friction = other.sharedMaterial.friction;
+	}
+	private void OnTriggerExit2D(Collider2D other) {
+		friction = 1f;
+	}
 }
