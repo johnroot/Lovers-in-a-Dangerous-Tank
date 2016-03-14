@@ -6,6 +6,7 @@ public class TankScript : MonoBehaviour
 
     public enum State { Null, Move, Turret, MachineGun, SpawnDrone };
 
+    public GameObject enemy;
     public float speed;
     public float rotationSpeed;
     public int turretFireRate;
@@ -49,6 +50,7 @@ public class TankScript : MonoBehaviour
     {
         turret = transform.Find("Turret").gameObject.GetComponent<GunScript>();
         machineGun = transform.Find("MachineGun").gameObject.GetComponent<GunScript>();
+        droneSpawner = gameObject.GetComponent<DroneSpawnerScript>();
         controller = GetComponent<ControllerScript>();
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
@@ -98,6 +100,9 @@ public class TankScript : MonoBehaviour
                 RotateTurret(controller.agent1Horizontal, 1);
                 FireGun(controller.agent1Trigger, 1);
                 ReloadGun(controller.agent1Reload, 1);
+                break;
+            case State.SpawnDrone:
+                SpawnDrone(true, 1); // TODO: find a button for to spawn the drone
                 break;
         }
 
@@ -218,7 +223,12 @@ public class TankScript : MonoBehaviour
             if (agent == State.SpawnDrone)
             {
                 GameObject drone = droneSpawner.SpawnDrone();
-                drone.layer = LayerMask.NameToLayer("Player" + controller.playerIndex + "Drone"); // e.g. Player1Drone
+                if (drone != null)
+                {
+                    Debug.Log("Drone actually spawned!");
+                    drone.layer = LayerMask.NameToLayer("Player" + controller.playerIndex + "Drone"); // e.g. Player1Drone
+                    drone.GetComponent<DroneScript>().target = enemy;
+                }
             }
         }
     }
@@ -248,6 +258,12 @@ public class TankScript : MonoBehaviour
                 agent1 = State.Move;
                 OperatorL.transform.localPosition = new Vector3(-95, -35);
                 agent1SwitchTimer = 0;
+            }
+            else if (controller.agent1SwitchVertical == -1.0f && agent2 != State.SpawnDrone)
+            {
+                Debug.Log("1.SpawnDrone");
+                agent1 = State.SpawnDrone;
+                OperatorL.transform.localPosition = new Vector3(-55, -50); // TODO(denis): Marshall figure where this should actually be
             }
         }
         else

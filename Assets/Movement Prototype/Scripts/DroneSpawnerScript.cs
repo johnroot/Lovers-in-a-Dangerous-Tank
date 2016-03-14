@@ -17,8 +17,10 @@ public class DroneSpawnerScript : MonoBehaviour {
 
     public GameObject SpawnDrone()
     {
-        if (timeSincePreviousSpawn == spawnRate)
+        Debug.Log("I am being called!");
+        if (timeSincePreviousSpawn >= spawnRate)
         {
+            Debug.Log("I am being called in here!");
             GameObject droneInstance = (GameObject) Instantiate(drone, transform.position, transform.rotation);
             timeSincePreviousSpawn = 0;
             return droneInstance;
