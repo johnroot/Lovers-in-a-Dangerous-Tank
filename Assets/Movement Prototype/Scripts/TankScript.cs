@@ -61,7 +61,9 @@ public class TankScript : MonoBehaviour
         agent2Vertical = 0;
 
         agent1 = State.Move;
+        OperatorL.transform.localPosition = new Vector3(-25, 110);
         agent2 = State.MachineGun;
+        OperatorR.transform.localPosition = new Vector3(35, 110);
 
         agent1SwitchTimer = agentSwitchCooldown;
         agent2SwitchTimer = agentSwitchCooldown;
@@ -245,28 +247,28 @@ public class TankScript : MonoBehaviour
             {
                 Debug.Log("1.Turret");
                 agent1 = State.Turret;
-                OperatorL.transform.localPosition = new Vector3(-15, 2);
+                OperatorL.transform.localPosition = new Vector3(0, 15);
                 agent1SwitchTimer = 0;
             }
             else if (controller.agent1SwitchHorizontal == -1.0f && agent2 != State.MachineGun)
             {
                 Debug.Log("1.MachineGun");
                 agent1 = State.MachineGun;
-                OperatorL.transform.localPosition = new Vector3(-95, 50);
+                OperatorL.transform.localPosition = new Vector3(35, 110);
                 agent1SwitchTimer = 0;
             }
             else if (controller.agent1SwitchVertical == 1.0f && agent2 != State.Move)
             {
                 Debug.Log("1.Move");
                 agent1 = State.Move;
-                OperatorL.transform.localPosition = new Vector3(-95, -35);
+                OperatorL.transform.localPosition = new Vector3(-25, 110);
                 agent1SwitchTimer = 0;
             }
             else if (controller.agent1SwitchVertical == -1.0f && agent2 != State.SpawnDrone)
             {
                 Debug.Log("1.SpawnDrone");
                 agent1 = State.SpawnDrone;
-                OperatorL.transform.localPosition = new Vector3(-55, -50); // TODO(denis): Marshall figure where this should actually be
+                OperatorL.transform.localPosition = new Vector3(0, -145); // TODO(denis): Marshall figure where this should actually be
                 agent1SwitchTimer = 0;
             }
         }
@@ -282,28 +284,28 @@ public class TankScript : MonoBehaviour
             {
                 Debug.Log("2.Turret");
                 agent2 = State.Turret;
-                OperatorR.transform.localPosition = new Vector3(-15, 2);
+                OperatorR.transform.localPosition = new Vector3(0, 15);
                 agent2SwitchTimer = 0;
             }
             else if (controller.agent2MachineGunSelect && agent1 != State.MachineGun)
             {
                 Debug.Log("2.MachineGun");
                 agent2 = State.MachineGun;
-                OperatorR.transform.localPosition = new Vector3(-95, 50);
+                OperatorR.transform.localPosition = new Vector3(35, 110);
                 agent2SwitchTimer = 0;
             }
             else if (controller.agent2MoveSelect && agent1 != State.Move)
             {
                 Debug.Log("2.Move");
                 agent2 = State.Move;
-                OperatorR.transform.localPosition = new Vector3(-95, -35);
+                OperatorR.transform.localPosition = new Vector3(-25, 110);
                 agent2SwitchTimer = 0;
             }
             else if (controller.agent2SpawnDroneSelect && agent1 != State.SpawnDrone)
             {
                 Debug.Log("2.SpawnDrone");
                 agent2 = State.SpawnDrone;
-                OperatorR.transform.localPosition = new Vector3(-55, -50); // TODO(denis): Marshall figure where this should actually be
+                OperatorR.transform.localPosition = new Vector3(0, -145); // TODO(denis): Marshall figure where this should actually be
                 agent2SwitchTimer = 0;
             }
         }
