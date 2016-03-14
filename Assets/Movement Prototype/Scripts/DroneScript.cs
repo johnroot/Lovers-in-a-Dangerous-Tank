@@ -18,6 +18,11 @@ public class DroneScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+        if (target == null)
+        {
+            Destroy(gameObject); // if the enemy was killed, just destroy myself
+            return;
+        }
         dronePosition = rb.position;
         targetPosition = target.transform.gameObject.GetComponent<Rigidbody2D>().position;
         rb.velocity = speed * (targetPosition - dronePosition).normalized;

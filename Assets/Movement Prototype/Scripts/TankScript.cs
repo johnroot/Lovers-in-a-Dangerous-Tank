@@ -217,17 +217,20 @@ public class TankScript : MonoBehaviour
 
     public void SpawnDrone(bool spawningTriggered, int agentIndex)
     {
-        if (spawningTriggered)
+        if (enemy != null)
         {
-            State agent = getAgent(agentIndex);
-            if (agent == State.SpawnDrone)
+            if (spawningTriggered)
             {
-                GameObject drone = droneSpawner.SpawnDrone();
-                if (drone != null)
+                State agent = getAgent(agentIndex);
+                if (agent == State.SpawnDrone)
                 {
-                    Debug.Log("Drone actually spawned!");
-                    drone.layer = LayerMask.NameToLayer("Player" + controller.playerIndex + "Drone"); // e.g. Player1Drone
-                    drone.GetComponent<DroneScript>().target = enemy;
+                    GameObject drone = droneSpawner.SpawnDrone();
+                    if (drone != null)
+                    {
+                        Debug.Log("Drone actually spawned!");
+                        drone.layer = LayerMask.NameToLayer("Player" + controller.playerIndex + "Drone"); // e.g. Player1Drone
+                        drone.GetComponent<DroneScript>().target = enemy;
+                    }
                 }
             }
         }
