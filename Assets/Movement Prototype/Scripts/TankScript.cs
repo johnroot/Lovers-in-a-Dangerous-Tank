@@ -264,6 +264,7 @@ public class TankScript : MonoBehaviour
                 Debug.Log("1.SpawnDrone");
                 agent1 = State.SpawnDrone;
                 OperatorL.transform.localPosition = new Vector3(-55, -50); // TODO(denis): Marshall figure where this should actually be
+                agent1SwitchTimer = 0;
             }
         }
         else
@@ -293,6 +294,13 @@ public class TankScript : MonoBehaviour
                 Debug.Log("2.Move");
                 agent2 = State.Move;
                 OperatorR.transform.localPosition = new Vector3(-95, -35);
+                agent2SwitchTimer = 0;
+            }
+            else if (controller.agent2SpawnDroneSelect && agent1 != State.SpawnDrone)
+            {
+                Debug.Log("2.SpawnDrone");
+                agent2 = State.SpawnDrone;
+                OperatorR.transform.localPosition = new Vector3(-55, -50); // TODO(denis): Marshall figure where this should actually be
                 agent2SwitchTimer = 0;
             }
         }
