@@ -25,6 +25,7 @@ public class DroneScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D coll)
     {
+        Debug.Log("Collided with an object!");
         HealthScript healthScript = coll.gameObject.GetComponent<HealthScript>();
         if (healthScript != null)
         {
