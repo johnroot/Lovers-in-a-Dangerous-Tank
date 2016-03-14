@@ -19,7 +19,6 @@ public class StartScreenController : MonoBehaviour
     {
         // Check for the existance of joysticks.
         int numJoysticks = Input.GetJoystickNames().Length;
-        Debug.Log(numJoysticks);
         player1Toggle.isOn = numJoysticks >= 1 ? true : false;
         player2Toggle.isOn = numJoysticks >= 2 ? true : false;
     }

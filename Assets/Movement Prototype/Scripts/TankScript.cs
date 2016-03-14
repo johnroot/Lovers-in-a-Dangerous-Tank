@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TankScript : MonoBehaviour {
+public class TankScript : MonoBehaviour
+{
 
     public enum State { Null, Move, Turret, MachineGun, SpawnDrone };
 
@@ -35,7 +36,13 @@ public class TankScript : MonoBehaviour {
 
     AudioSource audioSource;
 
-    void Start() {
+    // State switching cooldown for agents 1 and 2
+    int agent1SwitchTimer;
+    int agent2SwitchTimer;
+    public int agentSwitchCooldown;
+
+    void Start()
+    {
         turret = transform.Find("Turret").gameObject.GetComponent<GunScript>();
         machineGun = transform.Find("MachineGun").gameObject.GetComponent<GunScript>();
         controller = GetComponent<ControllerScript>();
@@ -49,25 +56,33 @@ public class TankScript : MonoBehaviour {
 
         agent1 = State.Move;
         agent2 = State.MachineGun;
+
+        agent1SwitchTimer = agentSwitchCooldown;
+        agent2SwitchTimer = agentSwitchCooldown;
     }
 
-    void FixedUpdate() {
-        if (agent1 == State.Move) {
-			rb.AddRelativeForce(new Vector2(agent1Vertical * speed, 0));
+    void FixedUpdate()
+    {
+        if (agent1 == State.Move)
+        {
+            rb.AddRelativeForce(new Vector2(agent1Vertical * speed, 0));
             rb.AddTorque(-agent1Horizontal * rotationSpeed);
         }
 
-        if (agent2 == State.Move) {
-			rb.AddRelativeForce(new Vector2(agent2Vertical * speed, 0));
+        if (agent2 == State.Move)
+        {
+            rb.AddRelativeForce(new Vector2(agent2Vertical * speed, 0));
             rb.AddTorque(-agent2Horizontal * rotationSpeed);
         }
-        
+
         audioSource.volume = rb.velocity.magnitude / (speed * 2) + Mathf.Abs(rb.angularVelocity) / 1000;
     }
 
-    void Update() {
+    void Update()
+    {
         // Handle the input for agent1
-        switch (agent1) {
+        switch (agent1)
+        {
             case State.Null:
                 break;
             case State.Move:
@@ -84,7 +99,8 @@ public class TankScript : MonoBehaviour {
         }
 
         // Handle the input for agent2
-        switch (agent2) {
+        switch (agent2)
+        {
             case State.Null:
                 break;
             case State.Move:
@@ -102,64 +118,90 @@ public class TankScript : MonoBehaviour {
         SwitchRoles();
     }
 
-    public void Steer(float horizontal, int agentIndex) {
-        if (agentIndex == 1) {
-            if (agent1 == State.Move) {
+    public void Steer(float horizontal, int agentIndex)
+    {
+        if (agentIndex == 1)
+        {
+            if (agent1 == State.Move)
+            {
                 agent1Horizontal = horizontal;
             }
-        } else if (agentIndex == 2) {
-            if (agent2 == State.Move) {
+        }
+        else if (agentIndex == 2)
+        {
+            if (agent2 == State.Move)
+            {
                 agent2Horizontal = horizontal;
             }
         }
     }
 
-    public void Accelerate(float vertical, int agentIndex) {
-        if (agentIndex == 1) {
-            if (agent1 == State.Move) {
+    public void Accelerate(float vertical, int agentIndex)
+    {
+        if (agentIndex == 1)
+        {
+            if (agent1 == State.Move)
+            {
                 agent1Vertical = vertical;
             }
         }
-        else if (agentIndex == 2) {
-            if (agent2 == State.Move) {
+        else if (agentIndex == 2)
+        {
+            if (agent2 == State.Move)
+            {
                 agent2Vertical = vertical;
             }
         }
     }
 
-    public void RotateTurret(float horizontal, int agentIndex) {
+    public void RotateTurret(float horizontal, int agentIndex)
+    {
         State agent = getAgent(agentIndex);
-        if (agent == State.Turret) {
+        if (agent == State.Turret)
+        {
             turret.Rotate(horizontal);
-        } else if (agent == State.MachineGun) {
+        }
+        else if (agent == State.MachineGun)
+        {
             machineGun.Rotate(horizontal);
         }
-        if (horizontal != 0) {
+        if (horizontal != 0)
+        {
             Debug.Log("Rotating " + agent + " for agent: " + agentIndex);
         }
     }
 
-    public void FireGun(float trigger, int agentIndex) {
+    public void FireGun(float trigger, int agentIndex)
+    {
         State agent = getAgent(agentIndex);
-        if (trigger > 0.75f) {
+        if (trigger > 0.75f)
+        {
             Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
-			if (agent == State.Turret) {
+            if (agent == State.Turret)
+            {
                 Debug.Log("Agent detected");
                 GameObject bullet = turret.Fire();
                 setLayerOfFiredBullet(bullet);
-            } else if (agent == State.MachineGun) {
+            }
+            else if (agent == State.MachineGun)
+            {
                 GameObject bullet = machineGun.Fire();
                 setLayerOfFiredBullet(bullet);
             }
         }
     }
 
-    public void ReloadGun(bool reloadTriggered, int agentIndex) {
-        if (reloadTriggered) {
+    public void ReloadGun(bool reloadTriggered, int agentIndex)
+    {
+        if (reloadTriggered)
+        {
             State agent = getAgent(agentIndex);
-            if (agent == State.Turret) {
+            if (agent == State.Turret)
+            {
                 turret.Reload();
-            } else if (agent == State.MachineGun) {
+            }
+            else if (agent == State.MachineGun)
+            {
                 machineGun.Reload();
             }
         }
@@ -178,49 +220,85 @@ public class TankScript : MonoBehaviour {
         }
     }
 
-    public void SwitchRoles() {
+    public void SwitchRoles()
+    {
         // Handle role switching for left hand
-        if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret) {
-            Debug.Log("1.Turret");
-            agent1 = State.Turret;
-            OperatorL.transform.localPosition = new Vector3(-15,2);
-        } else if (controller.agent1SwitchHorizontal == -1.0f && agent2 != State.MachineGun) {
-            Debug.Log("1.MachineGun");
-            agent1 = State.MachineGun;
-            OperatorL.transform.localPosition = new Vector3(-95, 50);
-        } else if (controller.agent1SwitchVertical == 1.0f && agent2 != State.Move) {
-            Debug.Log("1.Move");
-            agent1 = State.Move;
-            OperatorL.transform.localPosition = new Vector3(-95, -35);
+        if (agent1SwitchTimer > agentSwitchCooldown)
+        {
+            if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret)
+            {
+                Debug.Log("1.Turret");
+                agent1 = State.Turret;
+                OperatorL.transform.localPosition = new Vector3(-15, 2);
+                agent1SwitchTimer = 0;
+            }
+            else if (controller.agent1SwitchHorizontal == -1.0f && agent2 != State.MachineGun)
+            {
+                Debug.Log("1.MachineGun");
+                agent1 = State.MachineGun;
+                OperatorL.transform.localPosition = new Vector3(-95, 50);
+                agent1SwitchTimer = 0;
+            }
+            else if (controller.agent1SwitchVertical == 1.0f && agent2 != State.Move)
+            {
+                Debug.Log("1.Move");
+                agent1 = State.Move;
+                OperatorL.transform.localPosition = new Vector3(-95, -35);
+                agent1SwitchTimer = 0;
+            }
+        }
+        else
+        {
+            agent1SwitchTimer++;
         }
 
-        // Handle role switching for right hand
-        if (controller.agent2TurretSelect && agent1 != State.Turret) {
-            Debug.Log("2.Turret");
-            agent2 = State.Turret;
-            OperatorR.transform.localPosition = new Vector3(-15, 2);
-        } else if (controller.agent2MachineGunSelect && agent1 != State.MachineGun) {
-            Debug.Log("2.MachineGun");
-            agent2 = State.MachineGun;
-            OperatorR.transform.localPosition = new Vector3(-95, 50);
-        } else if (controller.agent2MoveSelect && agent1 != State.Move) {
-            Debug.Log("2.Move");
-            agent2 = State.Move;
-            OperatorR.transform.localPosition = new Vector3(-95, -35);
+        if (agent2SwitchTimer > agentSwitchCooldown)
+        {
+            // Handle role switching for right hand
+            if (controller.agent2TurretSelect && agent1 != State.Turret)
+            {
+                Debug.Log("2.Turret");
+                agent2 = State.Turret;
+                OperatorR.transform.localPosition = new Vector3(-15, 2);
+                agent2SwitchTimer = 0;
+            }
+            else if (controller.agent2MachineGunSelect && agent1 != State.MachineGun)
+            {
+                Debug.Log("2.MachineGun");
+                agent2 = State.MachineGun;
+                OperatorR.transform.localPosition = new Vector3(-95, 50);
+                agent2SwitchTimer = 0;
+            }
+            else if (controller.agent2MoveSelect && agent1 != State.Move)
+            {
+                Debug.Log("2.Move");
+                agent2 = State.Move;
+                OperatorR.transform.localPosition = new Vector3(-95, -35);
+                agent2SwitchTimer = 0;
+            }
+        }
+        else
+        {
+            agent2SwitchTimer++;
         }
     }
 
-    private void setLayerOfFiredBullet(GameObject bullet) {
+    private void setLayerOfFiredBullet(GameObject bullet)
+    {
         if (bullet != null)
         {
             bullet.layer = gameObject.layer;
         }
     }
 
-    private State getAgent(int agentIndex) {
-        if (agentIndex == 1) {
+    private State getAgent(int agentIndex)
+    {
+        if (agentIndex == 1)
+        {
             return agent1;
-        } else if (agentIndex == 2) {
+        }
+        else if (agentIndex == 2)
+        {
             return agent2;
         }
         return State.Null;
