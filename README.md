@@ -6,18 +6,6 @@
 
 #### Agent 1
 
-When in Move State, 
-A and D to steer left and right, respectively. W and S to accelerate forward and backward, respectively.
-
-When in Turret State,
-A and D to rotate the turret left and right, respectively. Q to fire.
-
-When in MachineGun State,
-A and D to rotate the machine gun left and right, respectively. Q to fire.
-
-As long as the other agent is not occupying the station for a given state, you can change to that state by,
-G to change to Move State, T to change to Turret State, and F to change to MachineGun State.
-
 #### Agent 2
 
 Not finished implementing yet!
@@ -28,13 +16,25 @@ Not implemented yet!
 
 ## XBox Controls
 
-### Player 1
+Left Joystick: Driving the tank.
+Moving the left joystick to the left rotates the tank counterclockwise.
+Moving the left joystick to the right rotates the tank clockwise.
+Moving the left joystick up moves the tank forward (from the perspective of the tank).
+Moving the left joystick down moves the tank backwards (from the perspective of the tank).
 
-#### Agent 1
+Right Joystick: Rotating the turret.
+Moving the right joystick to the left rotates the turret counterclockwise.
+Moving the right joystick to the right rotates the turret clockwise.
 
+Left Trigger: Fire turret.
+Right Trigger: Fire machine gun.
 
-#### Agent 2
+D-Pad: Follow this with an ABXY key to move an operator.
+Left: Tell left operator to move.
+Right: Tell right operator to move.
 
-### Player 2
-
-Not implemented yet!
+ABXY:
+A: Drive
+B: Machine Gun
+X: Turret
+Y: Drone
