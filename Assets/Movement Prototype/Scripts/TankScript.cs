@@ -27,8 +27,8 @@ public class TankScript : MonoBehaviour
     Rigidbody2D rb;
 
     // Axes for agents 1 and 2
-    float agent1Horizontal;
-    float agent1Vertical;
+    float tankHorizontal;
+    float tankVertical;
     float agent2Horizontal;
     float agent2Vertical;
 
@@ -36,15 +36,17 @@ public class TankScript : MonoBehaviour
     State agent2;
 
 	float friction = 1f;
-	Vector2 agent1CurrentVel = Vector2.zero;
-	Vector2 agent2CurrentVel = Vector2.zero;
+	Vector2 tankCurrentVel = Vector2.zero;
 
     AudioSource audioSource;
 
     // State switching cooldown for agents 1 and 2
-    int agent1SwitchTimer;
-    int agent2SwitchTimer;
+    int agentSwitchTimer;
+    // int agent2SwitchTimer;
     public int agentSwitchCooldown;
+
+    bool inSwitchMode = false;
+    int agentToSwitch = 0;
 
     void Start()
     {
@@ -55,8 +57,8 @@ public class TankScript : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
 
-        agent1Horizontal = 0;
-        agent1Vertical = 0;
+        tankHorizontal = 0;
+        tankVertical = 0;
         agent2Horizontal = 0;
         agent2Vertical = 0;
 
@@ -65,21 +67,14 @@ public class TankScript : MonoBehaviour
         agent2 = State.MachineGun;
         OperatorR.transform.localPosition = new Vector3(35, 110);
 
-        agent1SwitchTimer = agentSwitchCooldown;
-        agent2SwitchTimer = agentSwitchCooldown;
+        agentSwitchTimer = agentSwitchCooldown;
     }
 
     void FixedUpdate() {
-        if (agent1 == State.Move) {
-			agent1CurrentVel = Vector2.Lerp(agent1CurrentVel, new Vector2 (agent1Vertical * speed, 0), friction*friction);
-			rb.AddRelativeForce(agent1CurrentVel);
-			rb.AddTorque(-agent1Horizontal * rotationSpeed);
-        }
-
-        if (agent2 == State.Move) {
-			agent2CurrentVel = Vector2.Lerp(agent2CurrentVel, new Vector2 (agent2Vertical * speed, 0), friction*friction);
-			rb.AddRelativeForce(agent2CurrentVel);
-			rb.AddTorque(-agent2Horizontal * rotationSpeed * 1/friction);
+        if (agent1 == State.Move || agent2 == State.Move) {
+			tankCurrentVel = Vector2.Lerp(tankCurrentVel, new Vector2 (tankVertical * speed, 0), friction*friction);
+			rb.AddRelativeForce(tankCurrentVel);
+			rb.AddTorque(-tankHorizontal * rotationSpeed);
         }
 
         audioSource.volume = rb.velocity.magnitude / (speed * 2) + Mathf.Abs(rb.angularVelocity) / 1000;
@@ -87,6 +82,12 @@ public class TankScript : MonoBehaviour
 
     void Update()
     {
+        if (controller.tankHorizontal != 0 || controller.tankVertical != 0 ||
+            controller.turretTrigger > 0.25f || controller.machineGunTrigger > 0.25f ||
+            controller.turretHorizontal != 0) {
+            inSwitchMode = false;
+            agentToSwitch = 0;
+        }
         // Handle the input for agent1
         switch (agent1)
         {
@@ -94,17 +95,20 @@ public class TankScript : MonoBehaviour
                 break;
             case State.Move:
                 // Debug.Log("Agent 1 is moving");
-                Steer(controller.agent1Horizontal, 1);
-                Accelerate(controller.agent1Vertical, 1);
+                Steer(controller.tankHorizontal);
+                Accelerate(controller.tankVertical);
                 break;
             case State.Turret:
+                RotateTurret(controller.turretHorizontal);
+                FireGun(controller.turretTrigger);
+                // ReloadGun(controller.turretReload);
+                break;
             case State.MachineGun:
-                RotateTurret(controller.agent1Horizontal, 1);
-                FireGun(controller.agent1Trigger, 1);
-                ReloadGun(controller.agent1Reload, 1);
+                FireGun(controller.machineGunTrigger);
+                // ReloadGun(controller.agent1Reload, 1);
                 break;
             case State.SpawnDrone:
-                SpawnDrone(true, 1); // TODO: find a button for to spawn the drone
+                SpawnDrone(true); // TODO: find a button for to spawn the drone
                 break;
         }
 
@@ -115,85 +119,57 @@ public class TankScript : MonoBehaviour
                 break;
             case State.Move:
                 // Debug.Log("Agent 2 is moving");
-                Steer(controller.agent2Horizontal, 2);
-                Accelerate(controller.agent2Vertical, 2);
+                Steer(controller.tankHorizontal);
+                Accelerate(controller.tankVertical);
                 break;
             case State.Turret:
+                RotateTurret(controller.turretHorizontal);
+                FireGun(controller.turretTrigger);
+                break;
             case State.MachineGun:
-                RotateTurret(controller.agent2Horizontal, 2);
-                FireGun(controller.agent2Trigger, 2);
-                ReloadGun(controller.agent2Reload, 2);
+                FireGun(controller.machineGunTrigger);
+                break;
+            case State.SpawnDrone:
+                SpawnDrone(true); // TODO: find a button for to spawn the drone
                 break;
         }
         SwitchRoles();
     }
 
-    public void Steer(float horizontal, int agentIndex)
+    public void Steer(float horizontal)
     {
-        if (agentIndex == 1)
-        {
-            if (agent1 == State.Move)
-            {
-                agent1Horizontal = horizontal;
-            }
-        }
-        else if (agentIndex == 2)
-        {
-            if (agent2 == State.Move)
-            {
-                agent2Horizontal = horizontal;
-            }
-        }
+        tankHorizontal = horizontal;
     }
 
-    public void Accelerate(float vertical, int agentIndex)
+    public void Accelerate(float vertical)
     {
-        if (agentIndex == 1)
-        {
-            if (agent1 == State.Move)
-            {
-                agent1Vertical = vertical;
-            }
-        }
-        else if (agentIndex == 2)
-        {
-            if (agent2 == State.Move)
-            {
-                agent2Vertical = vertical;
-            }
-        }
+        tankVertical = vertical;
     }
 
-    public void RotateTurret(float horizontal, int agentIndex)
+    public void RotateTurret(float horizontal)
     {
-        State agent = getAgent(agentIndex);
-        if (agent == State.Turret)
+        if (agent1 == State.Turret || agent2 == State.Turret)
         {
             turret.Rotate(horizontal);
         }
-        else if (agent == State.MachineGun)
-        {
-            machineGun.Rotate(horizontal);
-        }
-        if (horizontal != 0)
-        {
-            Debug.Log("Rotating " + agent + " for agent: " + agentIndex);
-        }
+        // if (horizontal != 0)
+        // {
+        //     Debug.Log("Rotating " + agent + " for agent: " + agentIndex);
+        // }
     }
 
-    public void FireGun(float trigger, int agentIndex)
+    public void FireGun(float trigger)
     {
-        State agent = getAgent(agentIndex);
         if (trigger > 0.75f)
         {
-            Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
-            if (agent == State.Turret)
+            // Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
+            if (agent1 == State.Turret || agent2 == State.Turret)
             {
-                Debug.Log("Agent detected");
+                // Debug.Log("Agent detected");
                 GameObject bullet = turret.Fire();
                 setLayerOfFiredBullet(bullet);
             }
-            else if (agent == State.MachineGun)
+            else if (agent1 == State.MachineGun || agent2 == State.MachineGun)
             {
                 GameObject bullet = machineGun.Fire();
                 setLayerOfFiredBullet(bullet);
@@ -201,30 +177,28 @@ public class TankScript : MonoBehaviour
         }
     }
 
-    public void ReloadGun(bool reloadTriggered, int agentIndex)
-    {
-        if (reloadTriggered)
-        {
-            State agent = getAgent(agentIndex);
-            if (agent == State.Turret)
-            {
-                turret.Reload();
-            }
-            else if (agent == State.MachineGun)
-            {
-                machineGun.Reload();
-            }
-        }
-    }
+    // public void ReloadGun(bool reloadTriggered)
+    // {
+    //     if (reloadTriggered)
+    //     {
+    //         if (agent == State.Turret)
+    //         {
+    //             turret.Reload();
+    //         }
+    //         else if (agent == State.MachineGun)
+    //         {
+    //             machineGun.Reload();
+    //         }
+    //     }
+    // }
 
-    public void SpawnDrone(bool spawningTriggered, int agentIndex)
+    public void SpawnDrone(bool spawningTriggered)
     {
         if (enemy != null)
         {
             if (spawningTriggered)
             {
-                State agent = getAgent(agentIndex);
-                if (agent == State.SpawnDrone)
+                if (agent1 == State.SpawnDrone || agent2 == State.SpawnDrone)
                 {
                     GameObject drone = droneSpawner.SpawnDrone();
                     if (drone != null)
@@ -240,79 +214,93 @@ public class TankScript : MonoBehaviour
 
     public void SwitchRoles()
     {
-        // Handle role switching for left hand
-        if (agent1SwitchTimer > agentSwitchCooldown)
-        {
-            if (controller.agent1SwitchHorizontal == 1.0f && agent2 != State.Turret)
-            {
-                Debug.Log("1.Turret");
-                agent1 = State.Turret;
-                OperatorL.transform.localPosition = new Vector3(0, 15);
-                agent1SwitchTimer = 0;
+        // If not in switch mode, and timer has passed
+        // This is the switch for both
+        if (!inSwitchMode && agentSwitchTimer > agentSwitchCooldown) {
+            // If buttons pressed, we turn in switch mode to be true
+            if (controller.agentSwitchHorizontal == 1.0f) {
+                inSwitchMode = true;
+                agentToSwitch = 2;
+                agentSwitchTimer = 0;
+            } else if (controller.agentSwitchHorizontal == -1.0f) {
+                inSwitchMode = true;
+                agentToSwitch = 1;
+                agentSwitchTimer = 0;
             }
-            else if (controller.agent1SwitchHorizontal == -1.0f && agent2 != State.MachineGun)
-            {
-                Debug.Log("1.MachineGun");
-                agent1 = State.MachineGun;
-                OperatorL.transform.localPosition = new Vector3(35, 110);
-                agent1SwitchTimer = 0;
-            }
-            else if (controller.agent1SwitchVertical == 1.0f && agent2 != State.Move)
-            {
-                Debug.Log("1.Move");
-                agent1 = State.Move;
-                OperatorL.transform.localPosition = new Vector3(-25, 110);
-                agent1SwitchTimer = 0;
-            }
-            else if (controller.agent1SwitchVertical == -1.0f && agent2 != State.SpawnDrone)
-            {
-                Debug.Log("1.SpawnDrone");
-                agent1 = State.SpawnDrone;
-                OperatorL.transform.localPosition = new Vector3(0, -145); // TODO(denis): Marshall figure where this should actually be
-                agent1SwitchTimer = 0;
-            }
-        }
-        else
-        {
-            agent1SwitchTimer++;
+        } else {
+            // Increase timer passively
+            agentSwitchTimer++;
         }
 
-        if (agent2SwitchTimer > agentSwitchCooldown)
+
+        // Handle role switching for left hand
+        if (inSwitchMode)
         {
-            // Handle role switching for right hand
-            if (controller.agent2TurretSelect && agent1 != State.Turret)
-            {
-                Debug.Log("2.Turret");
-                agent2 = State.Turret;
-                OperatorR.transform.localPosition = new Vector3(0, 15);
-                agent2SwitchTimer = 0;
+            if (agentToSwitch == 1) {
+
+                if (controller.turretSelect && agent2 != State.Turret)
+                {
+                    Debug.Log("1.Turret");
+                    agent1 = State.Turret;
+                    OperatorL.transform.localPosition = new Vector3(0, 15);
+                    inSwitchMode = false;
+                }
+                else if (controller.machineGunSelect && agent2 != State.MachineGun)
+                {
+                    Debug.Log("1.MachineGun");
+                    agent1 = State.MachineGun;
+                    OperatorL.transform.localPosition = new Vector3(35, 110);
+                    inSwitchMode = false;
+                }
+                else if (controller.driveSelect && agent2 != State.Move)
+                {
+                    Debug.Log("1.Move");
+                    agent1 = State.Move;
+                    OperatorL.transform.localPosition = new Vector3(-25, 110);
+                    inSwitchMode = false;
+                }
+                else if (controller.droneSpawnSelect && agent2 != State.SpawnDrone)
+                {
+                    Debug.Log("1.SpawnDrone");
+                    agent1 = State.SpawnDrone;
+                    OperatorL.transform.localPosition = new Vector3(0, -145); // TODO(denis): Marshall figure where this should actually be
+                    inSwitchMode = false;
+                }
             }
-            else if (controller.agent2MachineGunSelect && agent1 != State.MachineGun)
-            {
-                Debug.Log("2.MachineGun");
-                agent2 = State.MachineGun;
-                OperatorR.transform.localPosition = new Vector3(35, 110);
-                agent2SwitchTimer = 0;
+
+            if (agentToSwitch == 2) {
+                if (controller.turretSelect && agent1 != State.Turret)
+                {
+                    Debug.Log("2.Turret");
+                    agent2 = State.Turret;
+                    OperatorR.transform.localPosition = new Vector3(0, 15);
+                    inSwitchMode = false;
+                }
+                else if (controller.machineGunSelect && agent1 != State.MachineGun)
+                {
+                    Debug.Log("2.MachineGun");
+                    agent2 = State.MachineGun;
+                    OperatorR.transform.localPosition = new Vector3(35, 110);
+                    inSwitchMode = false;
+                }
+                else if (controller.driveSelect && agent1 != State.Move)
+                {
+                    Debug.Log("2.Move");
+                    agent2 = State.Move;
+                    OperatorR.transform.localPosition = new Vector3(-25, 110);
+                    inSwitchMode = false;
+                }
+                else if (controller.droneSpawnSelect && agent1 != State.SpawnDrone)
+                {
+                    Debug.Log("2.SpawnDrone");
+                    agent2 = State.SpawnDrone;
+                    OperatorR.transform.localPosition = new Vector3(0, -145); // TODO(denis): Marshall figure where this should actually be
+                    inSwitchMode = false;
+                }
             }
-            else if (controller.agent2MoveSelect && agent1 != State.Move)
-            {
-                Debug.Log("2.Move");
-                agent2 = State.Move;
-                OperatorR.transform.localPosition = new Vector3(-25, 110);
-                agent2SwitchTimer = 0;
-            }
-            else if (controller.agent2SpawnDroneSelect && agent1 != State.SpawnDrone)
-            {
-                Debug.Log("2.SpawnDrone");
-                agent2 = State.SpawnDrone;
-                OperatorR.transform.localPosition = new Vector3(0, -145); // TODO(denis): Marshall figure where this should actually be
-                agent2SwitchTimer = 0;
-            }
+
         }
-        else
-        {
-            agent2SwitchTimer++;
-        }
+
     }
 
     private void setLayerOfFiredBullet(GameObject bullet)
