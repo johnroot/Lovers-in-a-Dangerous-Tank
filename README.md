@@ -2,17 +2,29 @@
 
 ## Keyboard Controls
 
-### Player 1
+WASD: Driving the tank.
+Pressing A rotates the tank counterclockwise.
+Pressing D rotates the tank clockwise.
+Pressing W moves the tank forward (from the perspective of the tank).
+Pressing S moves the tank backwards (from the perspective of the tank).
 
-#### Agent 1
+VB: Rotating the turret.
+Pressing V rotates the turret counterclockwise.
+Pressing B rotates the turret clockwise.
 
-#### Agent 2
+Q: Fire turret.
+Space: Fire machine gun.
 
-Not finished implementing yet!
+FG: Follow this with an ,LKO key to move an operator.
+F: Tell left operator to move.
+G: Tell right operator to move.
 
-### Player 2
+,LKO:
+,: Drive
+L: Machine Gun
+K: Turret
+O: Drone
 
-Not implemented yet!
 
 ## XBox Controls
 

@@ -100,11 +100,11 @@ public class TankScript : MonoBehaviour
                 break;
             case State.Turret:
                 RotateTurret(controller.turretHorizontal);
-                FireGun(controller.turretTrigger);
+                FireGun(controller.turretTrigger, true);
                 // ReloadGun(controller.turretReload);
                 break;
             case State.MachineGun:
-                FireGun(controller.machineGunTrigger);
+                FireGun(controller.machineGunTrigger, false);
                 // ReloadGun(controller.agent1Reload, 1);
                 break;
             case State.SpawnDrone:
@@ -124,10 +124,10 @@ public class TankScript : MonoBehaviour
                 break;
             case State.Turret:
                 RotateTurret(controller.turretHorizontal);
-                FireGun(controller.turretTrigger);
+                FireGun(controller.turretTrigger, true);
                 break;
             case State.MachineGun:
-                FireGun(controller.machineGunTrigger);
+                FireGun(controller.machineGunTrigger, false);
                 break;
             case State.SpawnDrone:
                 SpawnDrone(true); // TODO: find a button for to spawn the drone
@@ -158,19 +158,18 @@ public class TankScript : MonoBehaviour
         // }
     }
 
-    public void FireGun(float trigger)
+    public void FireGun(float trigger, bool isTurret)
     {
         if (trigger > 0.75f)
         {
             // Debug.Log("Trigger detected: " + trigger + " for agent: " + agentIndex);
-            if (agent1 == State.Turret || agent2 == State.Turret)
+            if (isTurret)
             {
                 // Debug.Log("Agent detected");
                 GameObject bullet = turret.Fire();
                 setLayerOfFiredBullet(bullet);
             }
-            else if (agent1 == State.MachineGun || agent2 == State.MachineGun)
-            {
+            else {
                 GameObject bullet = machineGun.Fire();
                 setLayerOfFiredBullet(bullet);
             }
